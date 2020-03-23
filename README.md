@@ -44,7 +44,7 @@ display(Image(filename='/workspace/course-v3/nbs/dl1/lego/Base Images/Brick_2x2_
 ```
 
 
-![jpeg](Pictures/output_15_0.jpeg)
+![jpeg](Picture/output_15_0.jpeg)
 
 
 
@@ -161,7 +161,7 @@ data.show_batch(rows=3, figsize=(7,6))
 ```
 
 
-![png](output_20_0.png)
+![png](Picture/output_20_0.png)
 
 
 Checking if the number of classes are correct.
@@ -192,7 +192,7 @@ learn.recorder.plot()
 
 
 
-![png](output_24_2.png)
+![png](Picture/output_24_2.png)
 
 
 After many tryouts, a bigger learning rate seems to work best, followed by a smaller one.
@@ -293,7 +293,7 @@ learn.recorder.plot()
     
 
 
-![png](output_31_2.png)
+![png](Picture/output_31_2.png)
 
 
 
@@ -418,7 +418,7 @@ learn.recorder.plot()
 
 
 
-![png](output_47_2.png)
+![png](Picture/output_47_2.png)
 
 
 
@@ -517,7 +517,7 @@ learn.recorder.plot()
     
 
 
-![png](output_57_2.png)
+![png](Picture/output_57_2.png)
 
 
 
@@ -713,7 +713,7 @@ interp.plot_top_losses(9, figsize=(15,11))
 ```
 
 
-![png](output_64_0.png)
+![png](Picture/output_64_0.png)
 
 
 As we can see, the neural net has difficulties if pictures contain more than one object. The first picture in the top left seems very reasonable, as the nn classifies the 1x3 brick as one 2x3 brick. The second picture is wrong classified by the nn, but also mislabelled as in the dataset. So the nn classified a 1x1 brick as 1x1 slope brick.
@@ -726,7 +726,7 @@ interp.plot_confusion_matrix(figsize=(12,12), dpi=60)
 ```
 
 
-![png](output_66_0.png)
+![png](Picture/output_66_0.png)
 
 
 The neural net confuses only two bricks with each other more than once. They both seem reasonable misinterpretations since the look alike very much from a certain angle.  
