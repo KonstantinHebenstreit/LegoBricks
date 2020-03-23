@@ -44,7 +44,7 @@ display(Image(filename='/workspace/course-v3/nbs/dl1/lego/Base Images/Brick_2x2_
 ```
 
 
-![jpeg](output_15_0.jpeg)
+![jpeg](Pictures/output_15_0.jpeg)
 
 
 
