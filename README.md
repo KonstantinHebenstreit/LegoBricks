@@ -33,7 +33,7 @@ path
 
 
 ```python
-!kaggle datasets download -d pacogarciam3/lego-brick-sorting-image-recognition
+kaggle datasets download -d pacogarciam3/lego-brick-sorting-image-recognition
 ```
 </br>
 The dataset includes images of size 640 x 480 and an ImageSetKey file.
