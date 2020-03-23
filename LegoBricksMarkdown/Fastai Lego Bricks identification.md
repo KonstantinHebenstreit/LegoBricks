@@ -1,7 +1,6 @@
 # Identifiing Lego bricks
 
-In this Notebook I will use what I have learned from the [fastai course](https://course.fast.ai/) part one to three. I found this nice lego brick dataset on Kaggle. Thanks to [Francesco Garcia](https://www.kaggle.com/pacogarciam3/lego-brick-sorting-image-recognition), who made a lot  of pictures of different bricks. 
-I show how I trained a CNN on resnet34 and resnet50.
+In this Notebook I will use what I have learned from the [fastai course](https://course.fast.ai/) part one to three. I found this nice lego brick dataset on Kaggle. Thanks to [Francesco Garcia](https://www.kaggle.com/pacogarciam3/lego-brick-sorting-image-recognition), who made a lot  of pictures of different bricks. CNN classification results of resnet34 and resnet50 are compaired.
 
 ### Imports
 
@@ -26,110 +25,18 @@ from IPython.display import display, Image
 
 
 ```python
-! {sys.executable} -m pip install kaggle --upgrade
-```
-
-    Collecting kaggle
-    [?25l  Downloading https://files.pythonhosted.org/packages/62/ab/bb20f9b9e24f9a6250f95a432f8d9a7d745f8d24039d7a5a6eaadb7783ba/kaggle-1.5.6.tar.gz (58kB)
-    [K     |████████████████████████████████| 61kB 3.5MB/s eta 0:00:011
-    [?25hRequirement already satisfied, skipping upgrade: urllib3<1.25,>=1.21.1 in /opt/conda/lib/python3.7/site-packages (from kaggle) (1.24.2)
-    Requirement already satisfied, skipping upgrade: six>=1.10 in /opt/conda/lib/python3.7/site-packages (from kaggle) (1.12.0)
-    Requirement already satisfied, skipping upgrade: certifi in /opt/conda/lib/python3.7/site-packages (from kaggle) (2019.11.28)
-    Requirement already satisfied, skipping upgrade: python-dateutil in /opt/conda/lib/python3.7/site-packages (from kaggle) (2.8.1)
-    Requirement already satisfied, skipping upgrade: requests in /opt/conda/lib/python3.7/site-packages (from kaggle) (2.22.0)
-    Requirement already satisfied, skipping upgrade: tqdm in /opt/conda/lib/python3.7/site-packages (from kaggle) (4.43.0)
-    Collecting python-slugify
-      Downloading https://files.pythonhosted.org/packages/92/5f/7b84a0bba8a0fdd50c046f8b57dcf179dc16237ad33446079b7c484de04c/python-slugify-4.0.0.tar.gz
-    Requirement already satisfied, skipping upgrade: idna<2.9,>=2.5 in /opt/conda/lib/python3.7/site-packages (from requests->kaggle) (2.8)
-    Requirement already satisfied, skipping upgrade: chardet<3.1.0,>=3.0.2 in /opt/conda/lib/python3.7/site-packages (from requests->kaggle) (3.0.4)
-    Collecting text-unidecode>=1.3
-    [?25l  Downloading https://files.pythonhosted.org/packages/a6/a5/c0b6468d3824fe3fde30dbb5e1f687b291608f9473681bbf7dabbf5a87d7/text_unidecode-1.3-py2.py3-none-any.whl (78kB)
-    [K     |████████████████████████████████| 81kB 5.9MB/s  eta 0:00:01
-    [?25hBuilding wheels for collected packages: kaggle, python-slugify
-      Building wheel for kaggle (setup.py) ... [?25ldone
-    [?25h  Created wheel for kaggle: filename=kaggle-1.5.6-cp37-none-any.whl size=72859 sha256=8c639412a2863d4ca750a063310b004eb235f4f6967c717c54e6d2779dabbd25
-      Stored in directory: /root/.cache/pip/wheels/57/4e/e8/bb28d035162fb8f17f8ca5d42c3230e284c6aa565b42b72674
-      Building wheel for python-slugify (setup.py) ... [?25ldone
-    [?25h  Created wheel for python-slugify: filename=python_slugify-4.0.0-py2.py3-none-any.whl size=5487 sha256=cb6a3f072a028e27823d12e95dfb150948c8586cfdd6df4eba26dee47dc4f7e6
-      Stored in directory: /root/.cache/pip/wheels/11/94/81/312969455540cb0e6a773e5d68a73c14128bfdfd4a7969bb4f
-    Successfully built kaggle python-slugify
-    Installing collected packages: text-unidecode, python-slugify, kaggle
-    Successfully installed kaggle-1.5.6 python-slugify-4.0.0 text-unidecode-1.3
-    
-
-
-```python
 path = Config.data_path()/'/workspace/course-v3/nbs/dl1/lego/'
 path.mkdir(parents=True, exist_ok=True)
 path
 ```
-
-
-
-
     PosixPath('/workspace/course-v3/nbs/dl1/lego')
-
-
-
-
-```python
-cd /root/
-```
-
-    /root
-    
-
-
-```python
-mkdir .kaggle
-```
-
-
-```python
-cd /workspace/course-v3/nbs/dl1/lego/
-```
-
-    /workspace/course-v3/nbs/dl1/lego
-    
-
-
-```python
-original = r'/workspace/kaggle.json'
-target = r'/root/.kaggle/kaggle.json'
-
-shutil.move(original,target)
-
-!chmod 600 /root/.kaggle/kaggle.json
-```
 
 
 ```python
 !kaggle datasets download -d pacogarciam3/lego-brick-sorting-image-recognition
 ```
-
-    Downloading lego-brick-sorting-image-recognition.zip to /workspace/course-v3/nbs/dl1/lego
-     99%|███████████████████████████████████████▌| 609M/616M [00:37<00:00, 33.1MB/s]
-    100%|████████████████████████████████████████| 616M/616M [00:37<00:00, 17.4MB/s]
-    
-
-
-```python
-with ZipFile('lego-brick-sorting-image-recognition.zip', 'r') as zip: 
-    zip.extractall() 
-```
-
-
-```python
-ls
-```
-
-    [0m[01;34m'Base Images'[0m/             [01;34m'base images'[0m/
-    [01;34m'Cropped Images'[0m/          [01;34m'cropped images'[0m/
-     ImageSetKey.csv           'example_1_Cropped Image.jpg'
-     Image_Count_Summary.jpg   'example_2_Base Image.jpg'
-     background_backlit_A.jpg   lego-brick-sorting-image-recognition.zip
-     background_backlit_B.jpg
-
+</br>
+The dataset includes images of size 640 x 480 and an ImageSetKey file.
 
 
 ```python
@@ -142,16 +49,8 @@ display(Image(filename='/workspace/course-v3/nbs/dl1/lego/Base Images/Brick_2x2_
 
 
 ```python
-isk = pd.read_csv('ImageSetKey.csv')
+isk = pd.read_csv('ImageSetKey.csv'); isk
 ```
-
-
-```python
-isk
-```
-
-
-
 
 <div>
 <style scoped>
@@ -263,14 +162,14 @@ isk
 
 
 ## Looking at the data
-
+As the data are sorted by folder, I do not need the ImageSetKey file, but import them classified by folder name. I downscale the size of the images to be able to do my first training quicker. Vertical transformations are included, as the bricks can be looked at from all directions.
 
 ```python
 tfms = get_transforms(flip_vert=True)
 data = ImageDataBunch.from_folder(path/'Base Images', ds_tfms=tfms, size=(120,160), valid_pct = 0.2)
 ```
 
-
+Picture of a databunch.
 ```python
 data.show_batch(rows=3, figsize=(7,6))
 ```
@@ -279,7 +178,7 @@ data.show_batch(rows=3, figsize=(7,6))
 ![png](output_20_0.png)
 
 
-
+Checking if the number of classes are correct.
 ```python
 print(data.classes)
 len(data.classes),data.c
@@ -287,10 +186,6 @@ len(data.classes),data.c
 
     ['Brick_1x1', 'Brick_1x2', 'Brick_1x3', 'Brick_1x4', 'Brick_2x2', 'Brick_2x2_L', 'Brick_2x2_Slope', 'Brick_2x3', 'Brick_2x4', 'Plate_1x1', 'Plate_1x1_Round', 'Plate_1x1_Slope', 'Plate_1x2', 'Plate_1x2_Grill', 'Plate_1x3', 'Plate_1x4', 'Plate_2x2', 'Plate_2x2_L', 'Plate_2x3', 'Plate_2x4']
     
-
-
-
-
     (20, 20)
 
 
@@ -308,66 +203,6 @@ learn.lr_find()
 learn.recorder.plot()
 ```
 
-
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:08<00:08]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>4.226988</td>
-      <td>#na#</td>
-      <td>00:08</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='32' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      56.14% [32/57 00:05<00:04 10.4765]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
-    
 
 
 ![png](output_24_2.png)
@@ -639,64 +474,6 @@ learn.recorder.plot()
 ```
 
 
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:08<00:08]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>0.165927</td>
-      <td>#na#</td>
-      <td>00:08</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='22' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      38.60% [22/57 00:05<00:08 0.5783]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
     
 
 
@@ -770,72 +547,10 @@ learn.recorder.plot()
 
 
 
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:08<00:08]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>0.181989</td>
-      <td>#na#</td>
-      <td>00:08</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='20' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      35.09% [20/57 00:04<00:07 0.4791]
-    </div>
-
-
-
-    Traceback (most recent call last):
-    
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
-    
-
-
 ![png](output_35_3.png)
 
 
+### Time to unfreeze and train all layers with a much smaller learning rate
 
 ```python
 learn.unfreeze()
@@ -998,9 +713,6 @@ learn.fit_one_cycle(20, slice(1e-6,1e-4))
 </table>
 
 
-It does not seem to get better anymore, so I unfreeze it to train all the layers.
-
-
 ```python
 learn.save('stage-2-1')
 ```
@@ -1018,63 +730,10 @@ learn.recorder.plot()
 
 
 
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='0' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      0.00% [0/2 00:00<00:00]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='52' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      91.23% [52/57 00:07<00:00 0.3641]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
-    
-
-
 ![png](output_40_2.png)
 
 
+One last time fitting the model.
 
 ```python
 learn.unfreeze()
@@ -1180,7 +839,7 @@ learn.load('stage-2-2');
 That looks reasonably good. The train_loss is still higher than the valid_loss, so the model is still underfitting, but an error rate of 2.7% is good enough for now. Let's see if resnet50 will perform better...
 
 ## Resnet 50
-
+For this comparisson the same parameters (cycles, learning rates) are used on Resnet 50.
 
 ```python
 learn = cnn_learner(data, models.resnet50, metrics=error_rate)
@@ -1192,66 +851,6 @@ learn.lr_find()
 learn.recorder.plot()
 ```
 
-
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:10<00:10]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>3.993057</td>
-      <td>#na#</td>
-      <td>00:10</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='32' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      56.14% [32/57 00:06<00:04 10.0998]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
-    
 
 
 ![png](output_47_2.png)
@@ -1520,65 +1119,6 @@ learn.lr_find()
 learn.recorder.plot()
 ```
 
-
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:09<00:09]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>0.098303</td>
-      <td>#na#</td>
-      <td>00:09</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='8' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      14.04% [8/57 00:03<00:21 0.1046]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
     
 
 
@@ -1650,65 +1190,6 @@ learn.lr_find()
 learn.recorder.plot()
 ```
 
-
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='2', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      50.00% [1/2 00:09<00:09]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>0.105167</td>
-      <td>#na#</td>
-      <td>00:09</td>
-    </tr>
-  </tbody>
-</table><p>
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='17' class='' max='57', style='width:300px; height:20px; vertical-align: middle;'></progress>
-      29.82% [17/57 00:06<00:15 0.3076]
-    </div>
-
-
-
-    LR Finder is complete, type {learner_name}.recorder.plot() to see the graph.
     
 
 
@@ -1881,15 +1362,9 @@ learn.fit_one_cycle(20, slice(1e-6,1e-4))
 ```python
 learn.save('stage-2-1-50')
 ```
-
-
-```python
-learn.load('stage-2-1-50');
-```
+Wow, the error rate went down to 1.9%, that is almost 30% decrease compared to Resnet34 with 2.7%.
 
 ## Results
-
-Let's see what results we have got. 
 
 We will first see which were the categories that the model most confused with one another. We will try if the predictions are reasonable or not (none of the mistakes seems obviously naive). This is an indicator that our classifier is working correctly. 
 
@@ -1904,13 +1379,6 @@ losses,idxs = interp.top_losses()
 len(data.valid_ds)==len(losses)==len(idxs)
 ```
 
-
-
-
-
-
-
-
     True
 
 
@@ -1924,7 +1392,9 @@ interp.plot_top_losses(9, figsize=(15,11))
 ![png](output_64_0.png)
 
 
-As we can see, the neural net has difficulties if pictures contain more than one object.
+As we can see, the neural net has difficulties if pictures contain more than one object. The first picture in the top left seems very reasonable, as the nn classifies the 1x3 brick as one 2x3 brick. The second picture is wrong classified by the nn, but also mislabelled as in the dataset. So the nn classified a 1x1 brick as 1x1 slope brick.
+
+Let' see all confused ones in a confusion matrix:
 
 
 ```python
@@ -1935,16 +1405,9 @@ interp.plot_confusion_matrix(figsize=(12,12), dpi=60)
 ![png](output_66_0.png)
 
 
+The neural net confuses only two bricks with each other more than once. They both seem reasonable misinterpretations since the look alike very much from a certain angle.  
 
-```python
-interp.most_confused(min_val=2)
-```
+## Possible Improvements
+ - The imagesize was reduced all the time. For better results, it would be useful to train the nn in multiple steps. Starting at small pictures and going step by step to bigger ones maximizes accuracy. 
 
-
-
-
-    [('Plate_1x1', 'Plate_1x1_Slope', 3), ('Plate_1x2', 'Plate_2x2_L', 2)]
-
-
-
-The neural net confuses only two bricks with each other more than once. They both seem reasonable misinterpretations since the look alike very much from a certain angle. 
+ - Picking a smaller learning rate at the first cycle could reduce the interim increse in loss after a few epochs.
