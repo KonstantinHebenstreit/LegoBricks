@@ -720,12 +720,11 @@ As we can see, the neural net has difficulties if pictures contain more than one
 
 
 Let' see all confused ones in a confusion matrix:
-
+test
 
 ```python
 interp.plot_confusion_matrix(figsize=(12,12), dpi=60)
 ```
-
 
 ![png](Pictures/output_66_0.png)
 
