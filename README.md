@@ -718,6 +718,7 @@ interp.plot_top_losses(9, figsize=(15,11))
 
 As we can see, the neural net has difficulties if pictures contain more than one object. The first picture in the top left seems very reasonable, as the nn classifies the 1x3 brick as one 2x3 brick. The second picture is wrong classified by the nn, but also mislabelled as in the dataset. So the nn classified a 1x1 brick as 1x1 slope brick.
 
+
 Let' see all confused ones in a confusion matrix:
 
 
