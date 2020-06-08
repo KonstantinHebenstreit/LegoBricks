@@ -1,4 +1,4 @@
-# Identifiing Lego bricks
+# Identifying Lego bricks
 
 In this Notebook I will use what I have learned from the [fastai course](https://course.fast.ai/) part one to three. I found this nice lego brick dataset on Kaggle. Thanks to [Francesco Garcia](https://www.kaggle.com/pacogarciam3/lego-brick-sorting-image-recognition), who made lots of pictures of different bricks. CNN classification results of resnet34 and resnet50 are compaired.
 
