@@ -686,6 +686,8 @@ learn.fit_one_cycle(20, slice(1e-6,1e-4))
 ```python
 learn.save('stage-2-1-50')
 ```
+Note: The model overfitted in the training, we can see that by looking at the error rate. It gets better until epoch 8, and then worse again - which means that it overfits. I leave it here as an example of overfitting. The model 'recovers' and gets back to a good state after 20 epochs.
+
 Wow, the error rate went down to 1.9%, that is almost 30% decrease compared to Resnet34 with 2.7%.
 
 ## Results
@@ -728,7 +730,7 @@ interp.plot_confusion_matrix(figsize=(12,12), dpi=60)
 ![png](Pictures/output_66_0.png)
 
 
-The neural net confuses only two bricks with each other more than once. They both seem reasonable misinterpretations since the look alike very much from a certain angle.  
+The neural net confuses only two bricks with each other more than once (Plate_1x1 with Plate_1x1_Slope and Plate_1x2 with Plate_2x2_L). They both seem reasonable misinterpretations since the look alike very much from a certain angle.  
 
 ## Possible Improvements
  - The imagesize was reduced all the time. For better results, it would be useful to train the nn in multiple steps. Starting at small pictures and going step by step to bigger ones maximizes accuracy. 
